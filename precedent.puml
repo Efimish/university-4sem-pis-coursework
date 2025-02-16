@@ -1,0 +1,22 @@
+@startuml consultant
+left to right direction
+skinparam actorStyle awesome
+
+actor Курьер as courier
+actor Менеджер as manager
+actor Продавец_консультант as seller
+
+seller --> (Проверить наличие товара)
+seller --> (Оформить продажу)
+seller --> (Уведомить покупателя)
+
+manager --> (Формирование заказа)
+manager --> (Просмотр состояния заказа)
+manager --> (Подтвердить выполнение заказа)
+manager --> (Возможность отменить заказ)
+manager --> (Просмотр истории заказов)
+
+courier --> (Возможность взять заказ)
+courier --> (Изменить состояние заказа)
+
+@enduml
