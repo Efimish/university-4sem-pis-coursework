@@ -1,11 +1,9 @@
 @startsalt Регистрация в системе
 {
   <b>Регистрация в системе
-  Имя пользователя   | "username"
-  Пароль             | "****    "
-  Подтвердите пароль | "****    "
-  [Cancel]           | [  OK   ]
+  Имя пользователя     | "username"
+  Пароль               | "****    "
+  Подтвердите пароль   | "****    "
+  [Зарегистрироваться] | [Вход в систему]
 }
 @endsalt
-
-https://cdn-0.plantuml.com/plantuml/png/SoWkIImgAKxCAL6uiE32rWkRB-ous7YnwMB3XGqNsu3iVeKBcnGkDa94WV9xBcpbgkPIKB19iYDMFL3rXHaNze2azb_OTs7tnPuBsu7q9g0Ea8hTG0a5XHe5fTBYrAAynDnK9P26-K3P1eXg1JY0gDC20X0JeWwePil59g1fMu7gjm3j1Pe9j0YX7LrBj7DYNd9gJYoAeT4A2lxUG5OiLosNGsfU2YX0k000

@@ -1,20 +1,17 @@
 @startsalt Список товаров
 {
-    {
-        [Выйти из системы] | [Поиск 🔍] | [Фильтр]
-    }
-    <b>Каталог деталей
-    {#
-        <b>Название        | <b>Артикул | <b>Цена | <b>Количество
-        iPhone 16 Pro Max  | 0001       | 10₽     | 100
-        Samsung Galaxy s25 | 0002       | 20₽     | 50
-        Thinkpad T480      | 0003       | 30₽     | 30
-    }
-    {
-        [Добавить товар в корзину] | [Ваши заявки]
-    }
-
+  {
+    [Выйти из системы] | [Поиск 🔍] | [Фильтр]
+  }
+  <b>Список товаров
+  {#
+    <b>Название        | <b>Артикул | <b>Цена  | <b>Количество | .
+    iPhone 16 Pro Max  | 0001       | 203 199₽ | 100           | [] .
+    Samsung Galaxy s25 | 0002       | 194 999₽ | 50            | [] .
+    Thinkpad T480      | 0003       | 34 523₽  | 30            | [X] .
+  }
+  {
+    [Перейти в корзину] | [История заказов]
+  }
 }
 @endsalt
-
-https://www.plantuml.com/plantuml/png/PP9FIiDG4CRtESM05qXRAov4kdCb5EnEkeYqs69DfQbGiOMOBXHQKKfN1Ic2k8xHaDV4n2jyxmgUm2CupPzOy2rcthpvVZE1BnMZh_NwXjRf4vxn1I5l4C4dQN5oO4jpdPLhXVXmJCynPdA25Qi4GS0ZnXZbsiMddDHfo98bedYUJp_B-NtozWA1G4wb9SrwF6qKnxsJVInWCsyZOEoTy04tBLsialLRSShqJx3XmU4OGi3DMiEu-IXDfWLyEKQGlht2HGWxhHQ84438MxZnXpk8yl7jQgkhDwcmGzLUbmwr0J6agceXtr5GlwqmlwivUQIT6vVwAHre7MrmHKQnd935d2nkaEK_iDPgwsSNMeDgsxjgfcMmb8Eb3R2KWAD_jimHuGqs70XfoUc6ZmI7u2EI9Zm8X7ASE3BZvXq4mUFB0npu49aroaYfDFN6-lVu1G00
