@@ -1,22 +1,19 @@
-@startuml consultant
+@startuml Диграмма прецедентов
 left to right direction
 skinparam actorStyle awesome
 
-actor Курьер as courier
 actor Менеджер as manager
-actor Продавец_консультант as seller
+actor Покупатель as customer
+' Физ. лицо или компания
 
-seller --> (Проверить наличие товара)
-seller --> (Оформить продажу)
-seller --> (Уведомить покупателя)
+customer --> (Зарегестрироваться)
+customer --> (Сделать заказ)
+customer --> (Посмотреть статус заказа)
+customer --> (Посмотреть историю заказов)
 
-manager --> (Формирование заказа)
-manager --> (Просмотр состояния заказа)
-manager --> (Подтвердить выполнение заказа)
-manager --> (Возможность отменить заказ)
-manager --> (Просмотр истории заказов)
-
-courier --> (Возможность взять заказ)
-courier --> (Изменить состояние заказа)
+manager --> (Добавить товары)
+' Можно импортировать список из excel
+manager --> (Обработать заказ)
+manager --> (Отдать готовый заказ)
 
 @enduml
