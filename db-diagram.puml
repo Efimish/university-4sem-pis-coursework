@@ -1,24 +1,36 @@
 @startuml Диаграмма базы данных
 
 entity User {
-  * id : TEXT
+  * id: TEXT
   --
-  type: "user" | "manager"
   login: TEXT
   FIO: TEXT
   password_hash: TEXT
+  created_at: DATETIME
+}
+
+entity Manager {
+  user_id: TEXT
 }
 
 entity Item {
-  * id : TEXT
+  * id: TEXT
   --
-  name : TEXT
+  name: TEXT
   article: INT
-  price : NUMERIC
+  price: NUMERIC
+  created_at: DATETIME
+}
+
+entity Cart_Item {
+  * user_id: TEXT
+  * item_id: INT
+  --
+  amount: INT
 }
 
 entity Order {
-  * id : TEXT
+  * id: TEXT
   --
   user_id: TEXT
   total_price: NUMERIC
@@ -35,7 +47,12 @@ entity Order_Item {
   amount: INT
 }
 
+Manager -- User
+
 Order --* User
+
+Cart_Item --* Item
+Cart_Item --* User
 
 Order_Item --* Item
 Order_Item --* Order
