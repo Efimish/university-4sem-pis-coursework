@@ -1,0 +1,43 @@
+@startuml Диаграмма базы данных
+
+entity User {
+  * id : TEXT
+  --
+  type: "user" | "manager"
+  login: TEXT
+  FIO: TEXT
+  password_hash: TEXT
+}
+
+entity Item {
+  * id : TEXT
+  --
+  name : TEXT
+  article: INT
+  price : NUMERIC
+}
+
+entity Order {
+  * id : TEXT
+  --
+  user_id: TEXT
+  total_price: NUMERIC
+  final_price: NUMERIC
+  status: "new" | "packed" | "completed" | "cancelled"
+  created_at: DATETIME
+}
+
+entity Order_Item {
+  * id: TEXT
+  --
+  item_id: INT
+  order_id: INT
+  amount: INT
+}
+
+Order --* User
+
+Order_Item --* Item
+Order_Item --* Order
+
+@enduml
