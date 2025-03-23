@@ -6,11 +6,8 @@ entity User {
   login: TEXT
   FIO: TEXT
   password_hash: TEXT
+  type: "buyer" | "manager"
   created_at: DATETIME
-}
-
-entity Manager {
-  user_id: TEXT
 }
 
 entity Item {
@@ -40,21 +37,17 @@ entity Order {
 }
 
 entity Order_Item {
-  * id: TEXT
+  * item_id: INT
+  * order_id: INT
   --
-  item_id: INT
-  order_id: INT
   amount: INT
 }
 
-Manager -- User
+User  ||--o{ Order      : Формирует
+Order ||--o{ Order_Item : Определяет
+Item  ||--o{ Order_Item : Составляет
 
-Order --* User
-
-Cart_Item --* Item
-Cart_Item --* User
-
-Order_Item --* Item
-Order_Item --* Order
+User ||--o{ Cart_Item : Определяет
+Item ||--o{ Cart_Item : Составляет
 
 @enduml
