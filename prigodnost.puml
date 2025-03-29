@@ -1,9 +1,0 @@
-@startuml Диаграмма пригодности
-
-actor User
-boundary "Окно входа"
-control "Do Something"
-
-User --> "Окно входа"
-
-@enduml

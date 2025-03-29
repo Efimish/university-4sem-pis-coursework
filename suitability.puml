@@ -1,0 +1,35 @@
+@startuml Диаграмма пригодности
+
+actor Buyer as "Покупатель"
+
+boundary item_list as "Окно списка товаров"
+boundary cart as "Окно корзины"
+boundary error as "Окно ошибки" #red
+
+control select_items as "Запросить товары"
+control add_item_to_cart as "Добавить товар в корзину"
+control open_cart as "Перейти к корзине"
+control return_back as "Вернуться назад"
+control create_order as "Создание заказа"
+control handle_errors as "Обработка ошибок"
+
+entity facade as "Фасад БД"
+
+Buyer -- item_list
+
+item_list -- select_items
+select_items -- facade
+item_list -- add_item_to_cart
+add_item_to_cart -- facade
+
+item_list -- open_cart
+open_cart -- cart
+cart -- return_back
+return_back -- item_list
+
+cart -- create_order
+create_order -- facade
+create_order -- handle_errors
+handle_errors -- error
+
+@enduml
