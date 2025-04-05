@@ -1,0 +1,20 @@
+@startuml Диаграмма пригодности отмены заказа
+
+actor Buyer as "Покупатель"
+
+boundary order_window as "Окно заказа"
+
+control load_order as "Загрузить заказ"
+control cancel_order as "Отменить заказ"
+
+entity facade as "Фасад БД"
+
+Buyer -- order_window
+
+order_window -- load_order
+load_order -- facade
+
+order_window -- cancel_order
+cancel_order -- facade
+
+@enduml

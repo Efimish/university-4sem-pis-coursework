@@ -1,0 +1,24 @@
+@startuml Диаграмма пригодности добавления новых товаров в список
+
+actor Manager as "Менеджер"
+
+boundary item_list as "Окно списка товаров"
+boundary error as "Окно ошибки" #red
+
+control select_items as "Запросить товары"
+control add_item_to_list as "Добавить товар в список"
+control handle_errors as "Обработка ошибок"
+
+entity facade as "Фасад БД"
+
+Manager -- item_list
+
+item_list -- select_items
+select_items -- facade
+item_list -- add_item_to_list
+add_item_to_list -- facade
+
+add_item_to_list -- handle_errors
+handle_errors -- error
+
+@enduml

@@ -1,4 +1,4 @@
-@startuml Диаграмма пригодности
+@startuml Диаграмма пригодности оформления заказа
 
 actor Buyer as "Покупатель"
 
@@ -22,10 +22,10 @@ select_items -- facade
 item_list -- add_item_to_cart
 add_item_to_cart -- facade
 
-item_list -- open_cart
-open_cart -- cart
-cart -- return_back
-return_back -- item_list
+item_list --> open_cart
+open_cart --> cart
+cart --> return_back
+return_back --> item_list
 
 cart -- create_order
 create_order -- facade
