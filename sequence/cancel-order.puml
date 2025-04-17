@@ -1,0 +1,20 @@
+@startuml Диаграмма последовательности отмены заказа
+
+actor Buyer as "Покупатель"
+
+boundary order_window as "Окно списка товаров"
+
+entity facade as "Фасад БД"
+
+Buyer -> order_window : Открыто окно
+
+order_window -> facade : getOrder()
+facade --> order_window : Order
+
+Buyer -> order_window : Нажата кнопка \n Отменить заказ
+
+order_window -> facade : cancelOrder(int order_id)
+
+order_window -> order_window : Отобразить информацию \n о заказе
+
+@enduml

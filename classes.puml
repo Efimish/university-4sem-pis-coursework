@@ -1,0 +1,90 @@
+@startuml Диаграмма классов
+
+class FacadeDB
+
+interface IUserDB {
+  + add_user(User user) => User
+  + get_users() => List<User>
+  + get_user_by_id(string id) => User
+  + get_user_by_login(string login) => User
+  + get_user_cart(string id) => List<Item>
+}
+
+interface IItemDB {
+  + add_item(Item item) => Item
+  + get_items() => List<Item>
+  + get_item_by_id(string id) => Item
+  + set_item_amount(string id, int amount) => Item
+}
+
+interface IOrderDB {
+  + add_order(Order order) => Order
+  + get_orders()
+  + get_order_by_id(string id)
+  + set_order_status(string id, string status)
+}
+
+FacadeDB --|> IUserDB
+FacadeDB --|> IItemDB
+FacadeDB --|> IOrderDB
+
+IUserDB <--o User
+IUserDB <--o Item
+IItemDB <--o Item
+IOrderDB <--o Order
+
+class User {
+  * id: TEXT
+  --
+  + login: TEXT
+  + password_hash: TEXT
+  + name: TEXT
+  + type: UserType
+  + created_at: DATETIME
+}
+
+enum UserType {
+  BUYER
+  MANAGER
+}
+
+User -> UserType
+
+class Item {
+  * id: TEXT
+  --
+  + name: TEXT
+  + article: INT
+  + price: NUMERIC
+  + created_at: DATETIME
+}
+
+class Order {
+  * id: TEXT
+  --
+  + user_id: TEXT
+  + total_price: NUMERIC
+  + final_price: NUMERIC
+  + status: OrderStatus
+  + created_at: DATETIME
+}
+
+enum OrderStatus {
+  NEW
+  PACKED
+  COMPLETED
+  CANCELLED
+}
+
+Order -> OrderStatus
+
+' WINDOWS
+
+WindowLogin o--> IUserDB
+WindowRegister o--> IUserDB
+WindowCart o--> IUserDB
+WindowItemList o--> IItemDB
+WindowOrderList o--> IOrderDB
+WindowOrder o--> IOrderDB
+
+@enduml

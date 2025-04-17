@@ -1,0 +1,28 @@
+@startuml Диаграмма последовательности оформления заказа
+
+actor Buyer as "Покупатель"
+
+boundary item_list as "Окно списка товаров"
+boundary cart as "Окно корзины"
+boundary error as "Окно ошибки" #red
+
+entity facade as "Фасад БД"
+
+Buyer -> item_list : Открыто окно
+
+item_list -> facade : getItems()
+facade --> item_list : List<Item>
+
+Buyer -> item_list : Добавление товаров \n в корзину
+
+item_list -> facade : addItemToCart(int item_id, int user_id)
+
+Buyer -> item_list : Нажата кнопка \n Открыть корзину
+Buyer -> cart : Открыто окно
+
+Buyer -> cart : Нажата кнопка \n Оформить заказ
+cart -> facade : createOrder(int user_id, List<Item> items)
+facade --> cart : Order order
+cart -> cart : Отобразить информацию \n о заказе
+
+@enduml

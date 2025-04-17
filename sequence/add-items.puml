@@ -1,0 +1,20 @@
+@startuml Диаграмма последовательности добавления новых товаров
+
+actor Manager as "Менеджер"
+
+boundary item_list as "Окно списка товаров"
+boundary error as "Окно ошибки" #red
+
+entity facade as "Фасад БД"
+
+Manager -> item_list : Открыто окно
+
+item_list -> facade : getItems()
+facade --> item_list : List<Item>
+
+Manager -> item_list : Добавление товара \n в список
+
+item_list -> facade : addItemToList(Item item)
+item_list -> item_list : Отобразить информацию \n о товаре
+
+@enduml
