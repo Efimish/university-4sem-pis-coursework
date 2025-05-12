@@ -4,7 +4,6 @@ actor Buyer as "Покупатель"
 
 boundary item_list as "Окно списка товаров"
 boundary cart as "Окно корзины"
-boundary error as "Окно ошибки" #red
 
 entity facade as "Фасад БД"
 

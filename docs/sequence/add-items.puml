@@ -3,7 +3,6 @@
 actor Manager as "Менеджер"
 
 boundary item_list as "Окно списка товаров"
-boundary error as "Окно ошибки" #red
 
 entity facade as "Фасад БД"
 

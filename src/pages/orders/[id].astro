@@ -1,0 +1,146 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Date from "@components/Date.astro";
+import { db, Order, OrderItem, Item, User, eq } from "astro:db";
+
+const { id } = Astro.params;
+
+const user = await Astro.session?.get("user");
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+if (!id) {
+  return Astro.redirect("/404");
+}
+
+// try to parse id into number
+const orderId = Number(id);
+if (isNaN(orderId)) {
+  return Astro.redirect("/404");
+}
+
+const orders = await db.select().from(Order).where(eq(Order.id, orderId));
+
+if (orders.length < 1) {
+  return Astro.redirect("/404");
+}
+
+const order = orders[0];
+
+const items = await db
+  .select()
+  .from(OrderItem)
+  .where(eq(OrderItem.orderId, order.id))
+  .innerJoin(Item, eq(OrderItem.itemId, Item.id));
+
+const [orderUser] = await db.select().from(User).where(eq(User.id, order.userId));
+
+const title = `Заказ №${order.id}`;
+const description = `Заказ №${order.id} на сумму ${order.totalPrice}₽. Статус: ${order.status}. Дата: ${order.createdAt}.`;
+---
+
+<BaseLayout {title} {description}>
+  <h1>Заказ №{order.id}</h1>
+  <a href="/orders">Вернуться к списку заказов</a>
+  <table>
+    <tr>
+      <th>Название</th>
+      <th>Цена</th>
+      <th>Кол-во</th>
+    </tr>
+    {
+      items.map((item) => (
+        <tr>
+          <td>{item.Item.name}</td>
+          <td>{item.Item.price}₽</td>
+          <td>
+            <input
+              type="number"
+              value={item.OrderItem.amount}
+              min="1"
+              max={item.Item.unitsInStock}
+              class="set-item-amount"
+              data-item-id={item.Item.id}
+            />
+          </td>
+        </tr>
+      ))
+    }
+  </table>
+  <p>Суммарная цена: {order.totalPrice}₽</p>
+  <p>Дата заказа: <Date date={order.createdAt} time /></p>
+  {user.isManager && (
+    <p>
+      <span>Заказчик:</span>
+      <span>{orderUser.name}</span>
+    </p>
+  )}
+  <p>
+    <span>Статус заказа:</span>
+    <span>
+      {
+        user.isManager ? (
+          <select name="status" id="status" data-order-id={order.id}>
+            <option value="pending" selected={order.status === "pending"}>
+              pending
+            </option>
+            <option value="packed" selected={order.status === "packed"}>
+              packed
+            </option>
+            <option value="completed" selected={order.status === "completed"}>
+              completed
+            </option>
+            <option value="cancelled" selected={order.status === "cancelled"}>
+              cancelled
+            </option>
+          </select>
+        ) : (
+          <span>
+            {order.status}
+            {order.status === "pending" && (
+              <button id="cancel-order" data-order-id={order.id}>
+                Отменить
+              </button>
+            )}
+          </span>
+        )
+      }
+    </span>
+  </p>
+</BaseLayout>
+
+<script>
+  import { actions } from "astro:actions";
+
+  const { data: user } = await actions.auth.whoami();
+
+  if (user?.isManager) {
+    const statusSelect = document.getElementById("status") as HTMLSelectElement;
+    const orderId = Number(statusSelect.dataset.orderId);
+
+    statusSelect.onchange = async (e) => {
+      const status = (e.target as HTMLOptionElement).value;
+
+      const { data: order } = await actions.orders.setOrderStatus({
+        orderId,
+        status: status as "pending" | "packed" | "completed" | "cancelled",
+      });
+    };
+  } else {
+    const cancelOrderButton = document.getElementById(
+      "cancel-order"
+    ) as HTMLButtonElement;
+    const orderId = Number(cancelOrderButton.dataset.orderId);
+
+    cancelOrderButton.onclick = async () => {
+      if (confirm("Вы уверены, что хотите отменить заказ?")) {
+        const { data: order } = await actions.orders.cancelOrder(orderId);
+        if (order) {
+          window.location.reload();
+        }
+      }
+    };
+  }
+</script>

@@ -1,0 +1,24 @@
+---
+import ThemeSwitcher from "@components/ThemeSwitcher.astro";
+import LogoutButton from "@components/LogoutButton.astro";
+
+const user = await Astro.session?.get("user");
+---
+
+<header>
+  <nav class="header">
+    {
+      user && (
+        <>
+          <a href="/items">Товары</a>
+          {!user?.isManager && <a href="/cart">Корзина</a>}
+          <a href="/orders">{user.isManager ? 'Список заказов' : 'История заказов'}</a>
+        </>
+      )
+    }
+    <span class="wide"></span>
+    {user ? <LogoutButton /> : <a href="/login">Вход</a>}
+    <ThemeSwitcher />
+  </nav>
+  <hr />
+</header>

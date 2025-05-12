@@ -1,0 +1,16 @@
+---
+const year = new Date().getFullYear();
+
+const user = await Astro.session?.get("user");
+---
+
+<footer>
+  <hr />
+  <div class="footer">
+    <span>Copyright &#169; {year}</span>
+    <span class="wide"></span>
+    {user && (
+      <span>Вы вошли как: {user.name}</span>
+    )}
+  </div>
+</footer>

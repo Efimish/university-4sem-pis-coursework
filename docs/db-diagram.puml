@@ -6,7 +6,7 @@ entity User {
   + login: TEXT
   + password_hash: TEXT
   + name: TEXT
-  + type: "buyer" | "manager"
+  + is_manager: BOOLEAN
   + created_at: DATETIME
 }
 

@@ -1,0 +1,105 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { db, Item, CartItem, eq } from "astro:db";
+
+const user = await Astro.session?.get("user");
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+const title = "Ваша корзина";
+const description = "";
+
+const cart = await db
+  .select()
+  .from(CartItem)
+  .where(eq(CartItem.userId, user.id))
+  .innerJoin(Item, eq(CartItem.itemId, Item.id));
+
+const totalPrice = cart.reduce((acc, item) => {
+  return acc + item.CartItem.amount * item.Item.price;
+}, 0);
+---
+
+<BaseLayout {title} {description}>
+  <h1>Корзина</h1>
+  <a href="/items">Вернуться к списку товаров</a>
+  <table>
+    <tr>
+      <th>Название</th>
+      <th>Цена</th>
+      <th>Кол-во</th>
+    </tr>
+    {
+      cart.map((item) => (
+        <tr>
+          <td>{item.Item.name}</td>
+          <td>{item.Item.price}₽</td>
+          <td>
+            <input
+              type="number"
+              value={item.CartItem.amount}
+              min="1"
+              max={item.Item.unitsInStock}
+              class="set-item-amount"
+              data-item-id={item.Item.id}
+            />
+          </td>
+        </tr>
+      ))
+    }
+  </table>
+  {cart.length > 0 ? (
+    <p>Суммарная цена: {totalPrice}₽</p>
+  ) : (
+    <p>Корзина пуста</p>
+  )}
+  <button id="make-an-order" disabled={cart.length < 1}>Оформить заказ</button>
+  <button id="clear-cart" disabled={cart.length < 1}>Очистить корзину</button>
+</BaseLayout>
+
+<script>
+  import { actions } from "astro:actions";
+
+  const { data: user } = await actions.auth.whoami();
+  const { data: cart } = await actions.user.getCart(user!.id);
+
+  const makeAnOrderButton = document.getElementById("make-an-order") as HTMLButtonElement;
+  const clearCartButton = document.getElementById("clear-cart") as HTMLInputElement;
+  const setItemAmountButtons = document.querySelectorAll<HTMLButtonElement>(".set-item-amount");
+
+  makeAnOrderButton.onclick = async () => {
+    if (confirm('Вы уверены, что хотите оформить заказ?')) {
+      await actions.orders.addOrderByUserId(user!.id);
+      window.location.reload();
+    }
+  }
+
+  clearCartButton.onclick = async () => {
+    if (confirm('Вы уверены, что хотите очистить корзину?')) {
+      await actions.user.clearCart(user!.id);
+      window.location.reload();
+    }
+  }
+
+  setItemAmountButtons.forEach(
+    (input) =>
+      (input.onchange = async () => {
+        const itemId = Number(input.dataset.itemId);
+        if (itemId !== 0 && !itemId) {
+          alert("Не удалось изменить товар в корзине!");
+          return;
+        }
+        const amount = Number(input.value);
+        const { data: item } = await actions.user.setItemInCart({
+          userId: user!.id,
+          itemId,
+          amount,
+        });
+        if (item) {
+          window.location.reload();
+        }
+      })
+  );
+</script>

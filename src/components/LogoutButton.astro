@@ -1,0 +1,13 @@
+---
+import { actions } from "astro:actions";
+
+interface Props {
+  message?: string;
+}
+
+const message = Astro.props.message || "Выйти";
+---
+
+<form method="post" action={actions.auth.logout}>
+  <input type="submit" value={message} />
+</form>

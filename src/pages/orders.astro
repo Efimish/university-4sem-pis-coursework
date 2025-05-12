@@ -1,0 +1,44 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Date from '@components/Date.astro';
+import { db, Order, User, eq } from 'astro:db';
+
+const title = "Ваша история заказов";
+const description = "";
+
+const user = await Astro.session?.get('user');
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+const orders = !user.isManager
+  ? await db.select().from(Order)
+  .where(eq(Order.userId, user.id))
+  .innerJoin(User, eq(Order.userId, User.id))
+  : await db.select().from(Order)
+  .innerJoin(User, eq(Order.userId, User.id));
+---
+
+<BaseLayout {title} {description}>
+  <h1>{user.isManager ? 'Список заказов' : 'История заказов'}</h1>
+  <a href="/items">Вернуться к списку товаров</a>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Статус</th>
+      <th>Цена</th>
+      <th>Дата</th>
+      {user.isManager && <th>Пользователь</th>}
+    </tr>
+    {orders.map(order => (
+      <tr>
+        <td><a href={`/orders/${order.Order.id}`}>{order.Order.id}</a></td>
+        <td>{order.Order.status}</td>
+        <td>{order.Order.totalPrice}₽</td>
+        <td><Date date={order.Order.createdAt}/></td>
+        {user.isManager && <td>{order.User.name}</td>}
+      </tr>
+    ))}
+  </table>
+</BaseLayout>

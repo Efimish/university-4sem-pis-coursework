@@ -1,0 +1,41 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { actions } from "astro:actions";
+
+const title = "Вход в систему";
+const description = "";
+
+const result = Astro.getActionResult(actions.auth.login);
+if (result && !result.error) {
+  return Astro.redirect("/items");
+}
+---
+
+<BaseLayout {title} {description}>
+  <h1>Вход в систему</h1>
+  {result?.error && <p style="color: red;">{result.error}</p>}
+  <form method="post" action={actions.auth.login}>
+    <div>
+      <label for="name">Login:</label>
+      <input required name="login" />
+    </div>
+
+    <div>
+      <label for="password">Password:</label>
+      <input required name="password" type="password" />
+    </div>
+
+    <div>
+      <input type="submit" value="Войти" />
+    </div>
+  </form>
+  <a href="/register">Регистрация</a>
+</BaseLayout>
+
+<style>
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+</style>

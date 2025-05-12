@@ -1,0 +1,19 @@
+{
+  "name": "Shop",
+  "short_name": "Shop",
+  "description": "Shop description",
+  "icons": [
+    {
+      "src": "/favicon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

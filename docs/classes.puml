@@ -24,9 +24,9 @@ interface IOrderDB {
   + set_order_status(string id, string status)
 }
 
-FacadeDB --|> IUserDB
-FacadeDB --|> IItemDB
-FacadeDB --|> IOrderDB
+FacadeDB ..|> IUserDB
+FacadeDB ..|> IItemDB
+FacadeDB ..|> IOrderDB
 
 IUserDB <--o User
 IUserDB <--o Item
@@ -48,7 +48,7 @@ enum UserType {
   MANAGER
 }
 
-User -> UserType
+User *- UserType
 
 class Item {
   * id: TEXT
@@ -76,7 +76,7 @@ enum OrderStatus {
   CANCELLED
 }
 
-Order -> OrderStatus
+Order *- OrderStatus
 
 ' WINDOWS
 
@@ -86,5 +86,16 @@ WindowCart o--> IUserDB
 WindowItemList o--> IItemDB
 WindowOrderList o--> IOrderDB
 WindowOrder o--> IOrderDB
+
+' ORM
+
+class Astro #grey {
+  + insert<T>(T).values(T[])
+  + select<T>().from(T) => T[]
+  + update<T>(T).set(T)
+  + delete<T>(T).values(T[])
+}
+
+FacadeDB o--> Astro
 
 @enduml
