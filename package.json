@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "db": "astro db push"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -20,9 +21,10 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@astrojs/db": "^0.14.13",
+    "@astrojs/db": "^0.14.14",
     "@astrojs/node": "^9.2.1",
-    "@astrojs/sitemap": "^3.3.1",
+    "@astrojs/sitemap": "^3.4.0",
+    "argon2": "^0.43.0",
     "astro": "^5.7.12",
     "vitest": "^3.1.3"
   }

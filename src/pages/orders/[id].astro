@@ -55,16 +55,7 @@ const description = `Заказ №${order.id} на сумму ${order.totalPric
         <tr>
           <td>{item.Item.name}</td>
           <td>{item.Item.price}₽</td>
-          <td>
-            <input
-              type="number"
-              value={item.OrderItem.amount}
-              min="1"
-              max={item.Item.unitsInStock}
-              class="set-item-amount"
-              data-item-id={item.Item.id}
-            />
-          </td>
+          <td>{item.OrderItem.amount}</td>
         </tr>
       ))
     }
