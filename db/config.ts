@@ -1,4 +1,4 @@
-import { defineDb, defineTable, column, NOW, FALSE } from 'astro:db';
+import { defineDb, defineTable, column, NOW, FALSE, TRUE } from 'astro:db';
 
 // https://astro.build/db/config
 
@@ -27,7 +27,7 @@ const Order = defineTable({
   columns: {
     id: column.number({ primaryKey: true }),
     userId: column.number({ references: () => User.columns.id }),
-    status: column.text({ default: "pending" }), // TODO: enum ["pending" | "packed" | "completed" | "canceled"]
+    status: column.text({ enum: ["pending", "packed", "completed", "cancelled"], default: "pending" }),
     totalPrice: column.number(), // WARN: denormalization
     createdAt: column.date({ default: NOW }),
   }
@@ -38,6 +38,7 @@ const CartItem = defineTable({
     userId: column.number({ references: () => User.columns.id }),
     itemId: column.number({ references: () => Item.columns.id }),
     amount: column.number(),
+    active: column.boolean({ default: TRUE }),
   },
   indexes: [
     { on: ["userId", "itemId"], unique: true }

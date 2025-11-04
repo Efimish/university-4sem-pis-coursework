@@ -186,6 +186,6 @@ export default async function seed() {
 
   await db.insert(CartItem).values([
     { userId: user_id, itemId: items[2].id, amount: 1 },
-    { userId: user_id, itemId: items[3].id, amount: 2 }
+    { userId: user_id, itemId: items[3].id, amount: 2, active: false }
   ]);
 }

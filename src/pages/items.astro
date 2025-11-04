@@ -188,7 +188,7 @@ const cartItemIds = (await db.select().from(CartItem).where(eq(CartItem.userId, 
         alert("Не удалось добавить товар в корзину!");
         return;
       }
-      const { data: item } = await actions.user.setItemInCart({ userId: user!.id, itemId, amount: 1 });
+      const { data: item } = await actions.user.setItemInCartAmount({ userId: user!.id, itemId, amount: 1 });
       if (item) {
         window.location.reload();
       }
@@ -200,7 +200,7 @@ const cartItemIds = (await db.select().from(CartItem).where(eq(CartItem.userId, 
         alert("Не удалось удалить товар из корзины!");
         return;
       }
-      const { data: item } = await actions.user.setItemInCart({ userId: user!.id, itemId, amount: 0 });
+      const { data: item } = await actions.user.setItemInCartAmount({ userId: user!.id, itemId, amount: 0 });
       if (item) {
         window.location.reload();
       }

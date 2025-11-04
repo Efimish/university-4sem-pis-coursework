@@ -18,7 +18,9 @@ const cart = await db
   .innerJoin(Item, eq(CartItem.itemId, Item.id));
 
 const totalPrice = cart.reduce((acc, item) => {
-  return acc + item.CartItem.amount * item.Item.price;
+  return (
+    acc + Number(item.CartItem.active) * item.CartItem.amount * item.Item.price
+  );
 }, 0);
 ---
 
@@ -30,6 +32,7 @@ const totalPrice = cart.reduce((acc, item) => {
       <th>Название</th>
       <th>Цена</th>
       <th>Кол-во</th>
+      <th>Выбрать</th>
     </tr>
     {
       cart.map((item) => (
@@ -46,16 +49,30 @@ const totalPrice = cart.reduce((acc, item) => {
               data-item-id={item.Item.id}
             />
           </td>
+          <td>
+            <input
+              type="checkbox"
+              checked={item.CartItem.active}
+              class="set-item-active"
+              data-item-id={item.Item.id}
+            />
+          </td>
         </tr>
       ))
     }
   </table>
-  {cart.length > 0 ? (
-    <p>Суммарная цена: {totalPrice}₽</p>
-  ) : (
-    <p>Корзина пуста</p>
-  )}
-  <button id="make-an-order" disabled={cart.length < 1}>Оформить заказ</button>
+  {
+    cart.length > 0 ? (
+      <p>Суммарная цена: {totalPrice}₽</p>
+    ) : (
+      <p>Корзина пуста</p>
+    )
+  }
+  <button
+    id="make-an-order"
+    disabled={cart.filter((item) => item.CartItem.active).length < 1}
+    >Оформить заказ</button
+  >
   <button id="clear-cart" disabled={cart.length < 1}>Очистить корзину</button>
 </BaseLayout>
 
@@ -65,23 +82,30 @@ const totalPrice = cart.reduce((acc, item) => {
   const { data: user } = await actions.auth.whoami();
   const { data: cart } = await actions.user.getCart(user!.id);
 
-  const makeAnOrderButton = document.getElementById("make-an-order") as HTMLButtonElement;
-  const clearCartButton = document.getElementById("clear-cart") as HTMLInputElement;
-  const setItemAmountButtons = document.querySelectorAll<HTMLButtonElement>(".set-item-amount");
+  const makeAnOrderButton = document.getElementById(
+    "make-an-order"
+  ) as HTMLButtonElement;
+  const clearCartButton = document.getElementById(
+    "clear-cart"
+  ) as HTMLInputElement;
+  const setItemAmountButtons =
+    document.querySelectorAll<HTMLButtonElement>(".set-item-amount");
+  const setItemActiveCheckboxes =
+    document.querySelectorAll<HTMLInputElement>(".set-item-active");
 
   makeAnOrderButton.onclick = async () => {
-    if (confirm('Вы уверены, что хотите оформить заказ?')) {
+    if (confirm("Вы уверены, что хотите оформить заказ?")) {
       await actions.orders.addOrderByUserId(user!.id);
       window.location.reload();
     }
-  }
+  };
 
   clearCartButton.onclick = async () => {
-    if (confirm('Вы уверены, что хотите очистить корзину?')) {
+    if (confirm("Вы уверены, что хотите очистить корзину?")) {
       await actions.user.clearCart(user!.id);
       window.location.reload();
     }
-  }
+  };
 
   setItemAmountButtons.forEach(
     (input) =>
@@ -92,10 +116,30 @@ const totalPrice = cart.reduce((acc, item) => {
           return;
         }
         const amount = Number(input.value);
-        const { data: item } = await actions.user.setItemInCart({
+        const { data: item } = await actions.user.setItemInCartAmount({
           userId: user!.id,
           itemId,
           amount,
+        });
+        if (item) {
+          window.location.reload();
+        }
+      })
+  );
+
+  setItemActiveCheckboxes.forEach(
+    (checkbox) =>
+      (checkbox.onchange = async () => {
+        const itemId = Number(checkbox.dataset.itemId);
+        if (itemId !== 0 && !itemId) {
+          alert("Не удалось изменить товар в корзине!");
+          return;
+        }
+        const active = checkbox.checked;
+        const { data: item } = await actions.user.setItemInCartActive({
+          userId: user!.id,
+          itemId,
+          active,
         });
         if (item) {
           window.location.reload();

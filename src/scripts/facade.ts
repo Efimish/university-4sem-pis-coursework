@@ -27,14 +27,20 @@ interface FacadeOrderItem extends FacadeItemSelect {
   amount: number;
 }
 
+interface FacadeCartItem extends FacadeOrderItem {
+  active: boolean;
+}
+
 interface FacadeOrderInsert {
   userId: number;
   items: FacadeOrderItem[];
 }
 
+type FacadeOrderStatus = "pending" | "packed" | "completed" | "cancelled";
+
 interface FacadeOrderSelectMany extends Omit<FacadeOrderInsert, 'items'> {
   id: number;
-  status: string;
+  status: FacadeOrderStatus;
   totalPrice: number;
   createdAt: Date;
 }
@@ -46,9 +52,10 @@ export interface IUserDB {
   getUsers: () => Promise<FacadeUserSelect[]>;
   getUserById: (id: number) => Promise<FacadeUserSelect | undefined>;
   getUserByLogin: (login: string) => Promise<FacadeUserSelect | undefined>;
-  getUserCart: (userId: number) => Promise<FacadeOrderItem[] | undefined>;
-  setUserCart: (userId: number, cart: FacadeOrderItem[]) => Promise<FacadeOrderItem[] | undefined>
-  setItemInCart: (userId: number, itemId: number, amount: number) => Promise<FacadeOrderItem | undefined>;
+  getUserCart: (userId: number) => Promise<FacadeCartItem[] | undefined>;
+  setUserCart: (userId: number, cart: FacadeCartItem[]) => Promise<FacadeCartItem[] | undefined>
+  setItemInCartAmount: (userId: number, itemId: number, amount: number) => Promise<FacadeCartItem | undefined>;
+  setItemInCartActive: (userId: number, itemId: number, active: boolean) => Promise<FacadeCartItem | undefined>;
 }
 
 export interface IItemDB {
@@ -65,7 +72,7 @@ export interface IOrderDB {
   getOrders: () => Promise<FacadeOrderSelectMany[]>;
   getOrderById: (id: number) => Promise<FacadeOrderSelect | undefined>;
   getOrdersByUserId: (userId: number) => Promise<FacadeOrderSelectMany[] | undefined>;
-  setOrderStatus: (orderId: number, status: string) => Promise<FacadeOrderSelectMany | undefined>;
+  setOrderStatus: (orderId: number, status: FacadeOrderStatus) => Promise<FacadeOrderSelectMany | undefined>;
 }
 
 class FacadeDB implements IUserDB, IItemDB, IOrderDB {
@@ -110,16 +117,17 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
     return cart.map(
       ({
         Item,
-        CartItem: { amount },
+        CartItem: { amount, active },
       }) =>
       ({
         ...Item,
         amount,
+        active,
       })
     );
   };
 
-  setUserCart = async (userId: number, cart: FacadeOrderItem[]) => {
+  setUserCart = async (userId: number, cart: FacadeCartItem[]) => {
     const users = await db.select({ id: User.id }).from(User)
       .where(
         eq(User.id, userId)
@@ -134,14 +142,15 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
       cart.map(i => ({
         userId,
         itemId: i.id,
-        amount: i.amount
+        amount: i.amount,
+        active: i.active,
       }))
     );
 
     return cart;
   }
 
-  setItemInCart = async (userId: number, itemId: number, amount: number) => {
+  setItemInCartAmount = async (userId: number, itemId: number, amount: number) => {
     const users = await db.select({ id: User.id }).from(User)
       .where(
         eq(User.id, userId)
@@ -161,11 +170,12 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
           eq(CartItem.itemId, itemId)
         )
       ).innerJoin(Item, eq(CartItem.itemId, Item.id)))
-      .map(({ Item, CartItem: { amount} }) => ({
+      .map(({ Item, CartItem: { amount, active } }) => ({
         ...Item,
         amount,
+        active,
       })
-    );
+      );
 
     // here we remove the item from cart
     if (amount < 1) {
@@ -178,7 +188,7 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
         )
       ).returning();
 
-      return item;
+      return { ...item, amount: 0, active: false };
     }
 
     // here we increase the item amount in cart
@@ -195,26 +205,94 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
       return {
         ...item,
         amount: updatedCartItem.amount,
+        active: updatedCartItem.active,
       };
       // here we add the item to cart
     } else {
       await db.insert(CartItem).values({
         userId,
         itemId,
-        amount
+        amount,
       }).returning();
       const [newItem] = (await db.select().from(CartItem)
+        .where(
+          and(
+            eq(CartItem.userId, userId),
+            eq(CartItem.itemId, itemId)
+          )
+        ).innerJoin(Item, eq(CartItem.itemId, Item.id)))
+        .map(({ Item, CartItem: { amount, active } }) => ({
+          ...Item,
+          amount,
+          active,
+        }));
+      return newItem;
+    }
+  };
+
+  setItemInCartActive = async (userId: number, itemId: number, active: boolean) => {
+    const users = await db.select({ id: User.id }).from(User)
+      .where(
+        eq(User.id, userId)
+      );
+    if (users.length < 1) return;
+
+    const items = await db.select({ id: Item.id }).from(Item)
+      .where(
+        eq(Item.id, itemId)
+      );
+    if (items.length < 1) return;
+
+    const [item] = (await db.select().from(CartItem)
       .where(
         and(
           eq(CartItem.userId, userId),
           eq(CartItem.itemId, itemId)
         )
       ).innerJoin(Item, eq(CartItem.itemId, Item.id)))
-      .map(({ Item, CartItem: { amount} }) => ({
+      .map(({ Item, CartItem: { amount, active } }) => ({
         ...Item,
         amount,
-      })
-    );
+        active,
+      }));
+
+    // here we set the item active
+    if (item !== undefined) {
+      const [updatedCartItem] = await db.update(CartItem)
+        .set({ active })
+        .where(
+          and(
+            eq(CartItem.userId, userId),
+            eq(CartItem.itemId, itemId)
+          )
+        )
+        .returning();
+      return {
+        ...item,
+        amount: updatedCartItem.amount,
+        active: updatedCartItem.active,
+      };
+      // here we add the item to cart
+    } else {
+      await db.insert(CartItem).values({
+        userId,
+        itemId,
+        amount: 1,
+        active,
+      }).returning();
+      const [newItem] = (await db.select().from(CartItem)
+        .where(
+          and(
+            eq(CartItem.userId, userId),
+            eq(CartItem.itemId, itemId)
+          )
+        ).innerJoin(Item, eq(CartItem.itemId, Item.id)))
+        .map(({ Item, CartItem: { amount, active } }) => ({
+          ...Item,
+          amount,
+          active,
+        })
+        );
       return newItem;
     }
   };
@@ -295,15 +373,17 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
   addOrderByUserId = async (userId: number) => {
     const cart = await this.getUserCart(userId);
     if (!cart) return;
+    const activeItems = cart.filter(item => item.active);
+    const inactiveItems = cart.filter(item => !item.active);
     const order: FacadeOrderInsert = {
       userId,
-      items: cart,
+      items: activeItems,
     }
     const newOrder = await this.addOrder(order);
     order.items.forEach(async (item) => {
       await this.updateItem(item.id, { unitsInStock: item.unitsInStock - item.amount });
     });
-    await this.setUserCart(userId, []);
+    await this.setUserCart(userId, inactiveItems);
     return newOrder;
   };
 
@@ -346,7 +426,7 @@ class FacadeDB implements IUserDB, IItemDB, IOrderDB {
     return orders;
   }
 
-  setOrderStatus = async (orderId: number, status: string) => {
+  setOrderStatus = async (orderId: number, status: FacadeOrderStatus) => {
     const orders = await db.select().from(Order)
       .where(
         eq(Order.id, orderId)

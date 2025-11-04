@@ -17,14 +17,24 @@ export const user = {
       return await userFacade.setUserCart(userId, []);
     },
   }),
-  setItemInCart: defineAction({
+  setItemInCartAmount: defineAction({
     input: z.object({
       userId: z.number(),
       itemId: z.number(),
       amount: z.number().min(0),
     }),
     handler: async ({ userId, itemId, amount }, _context) => {
-      return await userFacade.setItemInCart(userId, itemId, amount);
+      return await userFacade.setItemInCartAmount(userId, itemId, amount);
+    },
+  }),
+  setItemInCartActive: defineAction({
+    input: z.object({
+      userId: z.number(),
+      itemId: z.number(),
+      active: z.boolean(),
+    }),
+    handler: async ({ userId, itemId, active }, _context) => {
+      return await userFacade.setItemInCartActive(userId, itemId, active);
     },
   }),
 }
