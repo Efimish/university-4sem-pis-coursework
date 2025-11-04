@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
 import { db, Item, CartItem, eq } from "astro:db";
 
 const user = await Astro.session?.get("user");
@@ -29,6 +30,7 @@ const totalPrice = cart.reduce((acc, item) => {
   <a href="/items">Вернуться к списку товаров</a>
   <table>
     <tr>
+      <th>Изображение</th>
       <th>Название</th>
       <th>Цена</th>
       <th>Кол-во</th>
@@ -37,6 +39,14 @@ const totalPrice = cart.reduce((acc, item) => {
     {
       cart.map((item) => (
         <tr>
+          <th>
+            <Image
+              src={item.Item.image}
+              alt={item.Item.name}
+              width="120px"
+              height="100px"
+            />
+          </th>
           <td>{item.Item.name}</td>
           <td>{item.Item.price}₽</td>
           <td>

@@ -17,6 +17,7 @@ const Item = defineTable({
   columns: {
     id: column.number({ primaryKey: true }),
     name: column.text(),
+    image: column.text({ default: "/items/unknown.png" }),
     price: column.number(),
     unitsInStock: column.number({ default: 0 }),
     createdAt: column.date({ default: NOW })

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Date from "@components/Date.astro";
+import { Image } from "astro:assets";
 import { db, Order, OrderItem, Item, User, eq } from "astro:db";
 
 const { id } = Astro.params;
@@ -35,7 +36,10 @@ const items = await db
   .where(eq(OrderItem.orderId, order.id))
   .innerJoin(Item, eq(OrderItem.itemId, Item.id));
 
-const [orderUser] = await db.select().from(User).where(eq(User.id, order.userId));
+const [orderUser] = await db
+  .select()
+  .from(User)
+  .where(eq(User.id, order.userId));
 
 const title = `Заказ №${order.id}`;
 const description = `Заказ №${order.id} на сумму ${order.totalPrice}₽. Статус: ${order.status}. Дата: ${order.createdAt}.`;
@@ -46,6 +50,7 @@ const description = `Заказ №${order.id} на сумму ${order.totalPric
   <a href="/orders">Вернуться к списку заказов</a>
   <table>
     <tr>
+      <th>Изображение</th>
       <th>Название</th>
       <th>Цена</th>
       <th>Кол-во</th>
@@ -53,6 +58,14 @@ const description = `Заказ №${order.id} на сумму ${order.totalPric
     {
       items.map((item) => (
         <tr>
+          <th>
+            <Image
+              src={item.Item.image}
+              alt={item.Item.name}
+              width="120px"
+              height="100px"
+            />
+          </th>
           <td>{item.Item.name}</td>
           <td>{item.Item.price}₽</td>
           <td>{item.OrderItem.amount}</td>
@@ -62,12 +75,14 @@ const description = `Заказ №${order.id} на сумму ${order.totalPric
   </table>
   <p>Суммарная цена: {order.totalPrice}₽</p>
   <p>Дата заказа: <Date date={order.createdAt} time /></p>
-  {user.isManager && (
-    <p>
-      <span>Заказчик:</span>
-      <span>{orderUser.name}</span>
-    </p>
-  )}
+  {
+    user.isManager && (
+      <p>
+        <span>Заказчик:</span>
+        <span>{orderUser.name}</span>
+      </p>
+    )
+  }
   <p>
     <span>Статус заказа:</span>
     <span>

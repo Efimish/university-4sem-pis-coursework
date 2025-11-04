@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import LogoutButton from "@components/LogoutButton.astro";
+import { Image } from 'astro:assets';
 import { db, Item, CartItem, eq } from "astro:db";
 
 const title = "Список товаров";
@@ -21,6 +22,7 @@ const cartItemIds = (await db.select().from(CartItem).where(eq(CartItem.userId, 
   <LogoutButton message="Выйти из системы" />
   <table>
     <tr>
+      <th>Изображение</th>
       <th>Название</th>
       <th>Цена</th>
       <th>Кол-во</th>
@@ -30,6 +32,7 @@ const cartItemIds = (await db.select().from(CartItem).where(eq(CartItem.userId, 
       items.map((item) => (
         <tr>
           {user.isManager ? (
+            <th><Image src={item.image} alt={item.name} width="120px" height="100px" /></th>
             <td>
               <input value={item.name} data-item-id={item.id} data-name />
             </td>
@@ -44,6 +47,7 @@ const cartItemIds = (await db.select().from(CartItem).where(eq(CartItem.userId, 
               <button class="delete-item" data-item-id={item.id}>Удалить (!) товар</button>
             </td>
           ) : (
+            <th><Image src={item.image} alt={item.name} width="120px" height="100px" /></th>
             <td>{item.name}</td>
             <td>{item.price}₽</td>
             <td>{item.unitsInStock}</td>

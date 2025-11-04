@@ -14,12 +14,14 @@ interface FacadeUserSelect extends FacadeUserInsert {
 
 interface FacadeItemInsert {
   name: string;
+  image?: string;
   price: number;
   unitsInStock: number;
 }
 
 interface FacadeItemSelect extends FacadeItemInsert {
   id: number;
+  image: string;
   createdAt: Date;
 }
 

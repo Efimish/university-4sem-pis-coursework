@@ -20,26 +20,31 @@ export default async function seed() {
   const items = await db.insert(Item).values([
     {
       "name": "iPhone 16 Pro Max 256GB",
+      "image": "/items/iphone-16-pro-max.webp",
       "unitsInStock": 12,
       "price": 114718
     },
     {
       "name": "Samsung Galaxy S25 Ultra 512GB",
+      "image": "/items/galaxy-s25-ultra.webp",
       "unitsInStock": 8,
       "price": 130298
     },
     {
       "name": "ThinkPad T480 (i7, 16GB RAM, 512GB SSD)",
+      "image": "/items/thinkpad-t480.png",
       "unitsInStock": 5,
       "price": 65518
     },
     {
       "name": "MacBook Pro 16\" (M4 Max, 1TB, 48GB RAM)",
+      "image": "/items/macbook-16.png",
       "unitsInStock": 3,
       "price": 327918
     },
     {
       "name": "Google Pixel 9 Pro 256GB",
+      "image": "/items/pixel-9-pro.jpg",
       "unitsInStock": 10,
       "price": 90118
     },
