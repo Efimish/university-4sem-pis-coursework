@@ -29,5 +29,5 @@ test("items", async () => {
   expect(await itemFacade.getItemById(item.id)).toBeUndefined();
 
   // other
-  expect((await itemFacade.getItems()).length).toBeGreaterThan(0);
+  expect((await itemFacade.getItems()).length).toBe(0);
 });

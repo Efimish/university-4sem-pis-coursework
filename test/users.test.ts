@@ -43,10 +43,13 @@ test("users", async () => {
     unitsInStock: 5
   });
   // now add an item
-  await userFacade.setItemInCart(user.id, item1.id, 1)
+  await userFacade.setItemInCartAmount(user.id, item1.id, 1)
 
   // change amount to 2
-  await userFacade.setItemInCart(user.id, item1.id, 2);
+  await userFacade.setItemInCartAmount(user.id, item1.id, 2);
+
+  // make item inactive
+  await userFacade.setItemInCartActive(user.id, item1.id, false);
 
   const cart = await userFacade.getUserCart(user.id);
 
@@ -59,7 +62,8 @@ test("users", async () => {
   // add another item
   cart!.push({
     ...item2,
-    amount: 2
+    amount: 2,
+    active: true,
   });
 
   // set new cart
@@ -68,11 +72,14 @@ test("users", async () => {
   expect(newCart).toHaveLength(2);
 
   // remove second item
-  await userFacade.setItemInCart(user.id, item2.id, 0);
+  await userFacade.setItemInCartAmount(user.id, item2.id, 0);
 
   const newNewCart = await userFacade.getUserCart(user.id);
 
   expect(newNewCart).toHaveLength(1);
+
+  // add second item back
+  await userFacade.setItemInCartActive(user.id, item2.id, true);
 
   // other
   expect((await userFacade.getUsers()).length).toBeGreaterThan(0);
